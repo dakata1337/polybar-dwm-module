@@ -70,7 +70,7 @@ namespace modules {
     static constexpr const char* EVENT_LAYOUT_SET{"setlayoutsafe"};
 
    protected:
-    // bool input(const string& action, const string& data) override;
+    bool any_action(const string& action, const string& data);
 
    private:
     static constexpr const char* DEFAULT_FORMAT_TAGS{"<label-tags> <label-layout> <label-floating> <label-title>"};

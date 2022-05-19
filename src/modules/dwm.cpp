@@ -16,6 +16,10 @@ namespace modules {
   template class module<dwm_module>;
 
   dwm_module::dwm_module(const bar_settings& bar, string name_) : event_module<dwm_module>(bar, move(name_)) {
+    m_router->register_action_with_data(EVENT_TAG_VIEW, [this](const std::string &data){ return this->any_action("view", data); });
+    m_router->register_action_with_data(EVENT_TAG_TOGGLE_VIEW, [this](const std::string &data) { return this->any_action("toggleview", data); });
+    m_router->register_action_with_data(EVENT_LAYOUT_SET, [this](const std::string &data) { return this->any_action("setlayoutsafe", data); });
+
     // Load configuration
     m_formatter->add(
         DEFAULT_FORMAT, DEFAULT_FORMAT_TAGS, {TAG_LABEL_TAGS, TAG_LABEL_LAYOUT, TAG_LABEL_FLOATING, TAG_LABEL_TITLE});
@@ -262,22 +266,22 @@ namespace modules {
     return true;
   }
 
-  // bool dwm_module::input(const string& action, const string& data) {
-  //   m_log.info("%s: Sending workspace %s command to ipc handler", name(), action);
+  bool dwm_module::any_action(const string& action, const string& data) {
+    m_log.info("%s: Sending workspace %s command to ipc handler", name(), action);
 
-  //   try {
-  //     m_ipc->run_command(action, (Json::UInt64)stoul(data));
-  //     return true;
-  //   } catch (const dwmipc::SocketClosedError& err) {
-  //     m_log.err("%s: Disconnected from socket: %s", name(), err.what());
-  //     sleep(chrono::duration<double>(1));
-  //     reconnect_dwm();
-  //   } catch (const dwmipc::IPCError& err) {
-  //     throw module_error(err.what());
-  //   }
+    try {
+      m_ipc->run_command(action, (Json::UInt64)stoul(data));
+      return true;
+    } catch (const dwmipc::SocketClosedError& err) {
+      m_log.err("%s: Disconnected from socket: %s", name(), err.what());
+      sleep(chrono::duration<double>(1));
+      reconnect_dwm();
+    } catch (const dwmipc::IPCError& err) {
+      throw module_error(err.what());
+    }
 
-  //   return false;
-  // }
+    return false;
+  }
 
   dwm_module::state_t dwm_module::get_state(tag_mask_t bit_mask) const {
     /**
