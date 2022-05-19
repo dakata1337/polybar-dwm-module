@@ -1,3 +1,4 @@
+<<<<<<< HEAD:contrib/polybar-dwm-module.aur/PKGBUILD
 # Maintainer: Mihir Lad <mihirlad55 gmail>
 _pkgname=polybar-dwm-module
 pkgname="${_pkgname}"
@@ -6,17 +7,27 @@ pkgrel=1
 pkgdesc="polybar fork with a dwm module"
 arch=("i686" "x86_64")
 url="https://github.com/mihirlad55/polybar-dwm-module"
+=======
+# Maintainer: Patrick Ziegler <p.ziegler96@gmail.com>
+_pkgname=polybar
+pkgname="${_pkgname}-git"
+pkgver=3.6.3
+pkgrel=1
+pkgdesc="A fast and easy-to-use status bar"
+# aarch64 is not officially supported by polybar, it is only listed here for convenience
+arch=("i686" "x86_64" "aarch64")
+url="https://github.com/polybar/polybar"
+>>>>>>> 1ee11f7c9e72719f62981167a24fe7239774fa69:contrib/polybar-git.aur/PKGBUILD
 license=("MIT")
-depends=("cairo" "xcb-util-image" "xcb-util-wm" "xcb-util-xrm" "xcb-util-cursor"
-         "alsa-lib" "libpulse" "libmpdclient" "libnl" "jsoncpp" "curl")
-optdepends=("i3-wm: i3 module support"
-            "ttf-unifont: Font used in example config"
-            "siji-git: Font used in example config"
-            "xorg-fonts-misc: Font used in example config")
-makedepends=("cmake" "git" "python" "pkg-config" "python-sphinx" "i3-wm")
+depends=("libuv" "cairo" "xcb-util-image" "xcb-util-wm" "xcb-util-xrm"
+         "xcb-util-cursor" "alsa-lib" "libpulse" "libmpdclient" "libnl"
+         "jsoncpp" "curl")
+optdepends=("i3-wm: i3 module support")
+makedepends=("cmake" "git" "python" "pkg-config" "python-sphinx"
+             "python-packaging" "i3-wm")
+backup=("etc/polybar/config.ini")
 provides=("polybar")
 conflicts=("polybar")
-install="${_pkgname}.install"
 source=("${_pkgname}::git+${url}.git")
 sha256sums=("SKIP")
 

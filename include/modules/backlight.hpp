@@ -23,7 +23,7 @@ namespace modules {
     explicit backlight_module(const bar_settings&, string);
 
     void idle();
-    bool on_event(inotify_event* event);
+    bool on_event(const inotify_event& event);
     bool build(builder* builder, const string& tag) const;
 
     static constexpr auto TYPE = "internal/backlight";
@@ -32,7 +32,10 @@ namespace modules {
     static constexpr const char* EVENT_DEC = "dec";
 
    protected:
-    bool input(const string& action, const string& data);
+    void action_inc();
+    void action_dec();
+
+    void change_value(int value_mod);
 
    private:
     static constexpr auto TAG_LABEL = "<label>";
@@ -45,12 +48,14 @@ namespace modules {
     string m_path_backlight;
     float m_max_brightness;
     bool m_scroll{false};
+    int m_scroll_interval{5};
+    bool m_use_actual_brightness{true};
 
     brightness_handle m_val;
     brightness_handle m_max;
 
     int m_percentage = 0;
   };
-}  // namespace modules
+} // namespace modules
 
 POLYBAR_NS_END

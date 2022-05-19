@@ -65,7 +65,7 @@ namespace modules {
     }
 
     try {
-      m_ipc = factory_util::unique<dwmipc::Connection>(m_socket_path);
+      m_ipc = std::make_unique<dwmipc::Connection>(m_socket_path);
       m_log.info("%s: Connected to dwm socket", name());
 
       update_monitor_ref();
@@ -262,22 +262,22 @@ namespace modules {
     return true;
   }
 
-  bool dwm_module::input(const string& action, const string& data) {
-    m_log.info("%s: Sending workspace %s command to ipc handler", name(), action);
+  // bool dwm_module::input(const string& action, const string& data) {
+  //   m_log.info("%s: Sending workspace %s command to ipc handler", name(), action);
 
-    try {
-      m_ipc->run_command(action, (Json::UInt64)stoul(data));
-      return true;
-    } catch (const dwmipc::SocketClosedError& err) {
-      m_log.err("%s: Disconnected from socket: %s", name(), err.what());
-      sleep(chrono::duration<double>(1));
-      reconnect_dwm();
-    } catch (const dwmipc::IPCError& err) {
-      throw module_error(err.what());
-    }
+  //   try {
+  //     m_ipc->run_command(action, (Json::UInt64)stoul(data));
+  //     return true;
+  //   } catch (const dwmipc::SocketClosedError& err) {
+  //     m_log.err("%s: Disconnected from socket: %s", name(), err.what());
+  //     sleep(chrono::duration<double>(1));
+  //     reconnect_dwm();
+  //   } catch (const dwmipc::IPCError& err) {
+  //     throw module_error(err.what());
+  //   }
 
-    return false;
-  }
+  //   return false;
+  // }
 
   dwm_module::state_t dwm_module::get_state(tag_mask_t bit_mask) const {
     /**

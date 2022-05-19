@@ -1,5 +1,6 @@
 #pragma once
 
+#include <atomic>
 #include <chrono>
 #include <memory>
 
@@ -31,17 +32,14 @@ POLYBAR_NS
 
 namespace chrono = std::chrono;
 using namespace std::chrono_literals;
+using std::atomic;
 
 // fwd declarations
 class connection;
-struct xembed_data;
 class background_manager;
 class bg_slice;
 
 struct tray_settings {
-  tray_settings() = default;
-  tray_settings& operator=(const tray_settings& o) = default;
-
   alignment align{alignment::NONE};
   bool running{false};
   int rel_x{0};
@@ -60,26 +58,29 @@ struct tray_settings {
   unsigned int spacing{0U};
   unsigned int sibling{0U};
   rgba background{};
+  rgba foreground{};
   bool transparent{false};
   bool detached{false};
+  bool adaptive{false};
 };
 
 class tray_manager : public xpp::event::sink<evt::expose, evt::visibility_notify, evt::client_message,
                          evt::configure_request, evt::resize_request, evt::selection_clear, evt::property_notify,
                          evt::reparent_notify, evt::destroy_notify, evt::map_notify, evt::unmap_notify>,
                      public signal_receiver<SIGN_PRIORITY_TRAY, signals::ui::visibility_change, signals::ui::dim_window,
-                         signals::ui::update_background> {
+                         signals::ui::update_background, signals::ui_tray::tray_pos_change> {
  public:
   using make_type = unique_ptr<tray_manager>;
-  static make_type make();
+  static make_type make(const bar_settings& settings);
 
-  explicit tray_manager(connection& conn, signal_emitter& emitter, const logger& logger, background_manager& back);
+  explicit tray_manager(connection& conn, signal_emitter& emitter, const logger& logger, background_manager& back,
+      const bar_settings& settings);
 
   ~tray_manager();
 
   const tray_settings settings() const;
 
-  void setup(const bar_settings& bar_opts);
+  void setup();
   void activate();
   void activate_delayed(chrono::duration<double, std::milli> delay = 1s);
   void deactivate(bool clear_selection = true);
@@ -106,8 +107,9 @@ class tray_manager : public xpp::event::sink<evt::expose, evt::visibility_notify
   void track_selection_owner(xcb_window_t owner);
   void process_docking_request(xcb_window_t win);
 
-  int calculate_x(unsigned width, bool abspos = true) const;
+  int calculate_x(unsigned width) const;
   int calculate_y(bool abspos = true) const;
+
   unsigned short int calculate_w() const;
   unsigned short int calculate_h() const;
 
@@ -120,21 +122,22 @@ class tray_manager : public xpp::event::sink<evt::expose, evt::visibility_notify
   void remove_client(xcb_window_t win, bool reconfigure = true);
   unsigned int mapped_clients() const;
 
-  void handle(const evt::expose& evt);
-  void handle(const evt::visibility_notify& evt);
-  void handle(const evt::client_message& evt);
-  void handle(const evt::configure_request& evt);
-  void handle(const evt::resize_request& evt);
-  void handle(const evt::selection_clear& evt);
-  void handle(const evt::property_notify& evt);
-  void handle(const evt::reparent_notify& evt);
-  void handle(const evt::destroy_notify& evt);
-  void handle(const evt::map_notify& evt);
-  void handle(const evt::unmap_notify& evt);
+  void handle(const evt::expose& evt) override;
+  void handle(const evt::visibility_notify& evt) override;
+  void handle(const evt::client_message& evt) override;
+  void handle(const evt::configure_request& evt) override;
+  void handle(const evt::resize_request& evt) override;
+  void handle(const evt::selection_clear& evt) override;
+  void handle(const evt::property_notify& evt) override;
+  void handle(const evt::reparent_notify& evt) override;
+  void handle(const evt::destroy_notify& evt) override;
+  void handle(const evt::map_notify& evt) override;
+  void handle(const evt::unmap_notify& evt) override;
 
-  bool on(const signals::ui::visibility_change& evt);
-  bool on(const signals::ui::dim_window& evt);
-  bool on(const signals::ui::update_background& evt);
+  bool on(const signals::ui::visibility_change& evt) override;
+  bool on(const signals::ui::dim_window& evt) override;
+  bool on(const signals::ui::update_background& evt) override;
+  bool on(const signals::ui_tray::tray_pos_change& evt) override;
 
  private:
   connection& m_connection;
@@ -168,6 +171,8 @@ class tray_manager : public xpp::event::sink<evt::expose, evt::visibility_notify
   mutex m_mtx{};
 
   bool m_firstactivation{true};
+
+  const bar_settings& m_bar_opts;
 };
 
 POLYBAR_NS_END

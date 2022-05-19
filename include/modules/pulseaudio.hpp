@@ -29,7 +29,9 @@ namespace modules {
     static constexpr auto EVENT_TOGGLE = "toggle";
 
    protected:
-    bool input(const string& action, const string& data);
+    void action_inc();
+    void action_dec();
+    void action_toggle();
 
    private:
     static constexpr auto FORMAT_VOLUME = "format-volume";
@@ -51,6 +53,7 @@ namespace modules {
     atomic<bool> m_muted{false};
     atomic<int> m_volume{0};
     atomic<double> m_decibels{0};
+    atomic<bool> m_reverse_scroll{false};
   };
 }  // namespace modules
 
