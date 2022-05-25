@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+SUDO="sudo"
+if [ -f "/usr/bin/doas" ]; then
+  SUDO="doas"
+fi
+
 readonly SELF=${0##*/}
 declare -rA COLORS=(
   [RED]=$'\033[0;31m'
@@ -47,7 +52,7 @@ usage() {
       ${COLORS[GREEN]}-f${COLORS[OFF]}
           Remove existing build dir; disabled by default.
       ${COLORS[GREEN]}-I, --no-install${COLORS[OFF]}
-          Do not execute 'sudo make install'; enabled by default.
+          Do not execute '${SUDO} make install'; enabled by default.
       ${COLORS[GREEN]}-A, --auto${COLORS[OFF]}
           Automatic, non-interactive installation; disabled by default.
           When set, script defaults options not explicitly set.
@@ -73,12 +78,12 @@ install() {
   fi
 
   if [[ -z "$INSTALL" ]]; then
-    read -r -p "$(msg "Execute 'sudo make install'? [Y/n] ")" -n 1 p && echo
+    read -r -p "$(msg "Execute '${SUDO} make install'? [Y/n] ")" -n 1 p && echo
     [[ "${p^^}" != "N" ]] && INSTALL="ON" || INSTALL="OFF"
   fi
 
   if [[ "$INSTALL" == ON ]]; then
-    sudo make install || msg_err "Failed to install executables..."
+    ${SUDO} make install || msg_err "Failed to install executables..."
   fi
 }
 
