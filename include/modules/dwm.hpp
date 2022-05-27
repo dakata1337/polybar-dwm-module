@@ -19,6 +19,7 @@ namespace modules {
      */
     enum class state_t : uint8_t {
       URGENT,     ///< Tag is urgent, overrides all below
+      ACTIVE,     ///< Tag is selected and is occupied
       FOCUSED,    ///< Monitor is selected and tag is selected, overrides all below
       UNFOCUSED,  ///< Monitor is not selected, but tag is selected
       VISIBLE,    ///< Tag is not selected, but occupied

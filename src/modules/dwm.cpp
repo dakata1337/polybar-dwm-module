@@ -27,6 +27,8 @@ namespace modules {
     // Populate m_state_labels map with labels and their states
     if (m_formatter->has(TAG_LABEL_TAGS)) {
       m_state_labels.emplace(
+          state_t::ACTIVE, load_optional_label(m_conf, name(), "label-active", DEFAULT_STATE_LABEL));
+      m_state_labels.emplace(
           state_t::FOCUSED, load_optional_label(m_conf, name(), "label-focused", DEFAULT_STATE_LABEL));
       m_state_labels.emplace(
           state_t::UNFOCUSED, load_optional_label(m_conf, name(), "label-unfocused", DEFAULT_STATE_LABEL));
@@ -304,6 +306,9 @@ namespace modules {
     if (tag_state.urgent & bit_mask) {
       // Tag is urgent
       return state_t::URGENT;
+    } else if (tag_state.occupied & tag_state.selected & bit_mask) {
+      // Tag is selected and is occupied
+      return state_t::ACTIVE;
     } else if (is_mon_active && tag_state.selected & bit_mask) {
       // Tag selected on selected monitor
       return state_t::FOCUSED;
