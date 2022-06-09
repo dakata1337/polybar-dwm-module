@@ -458,10 +458,10 @@ namespace modules {
         m_log.err("%s: Disconnected from socket: %s", name(), err.what());
         sleep(chrono::duration<double>(1));
         reconnect_dwm();
+      } catch (const dwmipc::ResultFailureError& err) {
+        m_log.warn("%s: Could not get updated client title label: %s", name(), err.what());
       } catch (const dwmipc::IPCError& err) {
-        // Causes the module to crash
-        // throw module_error(err.what());
-        return;
+        throw module_error(err.what());
       }
     }
     update_title_label(new_title);
@@ -475,10 +475,10 @@ namespace modules {
         m_log.err("%s: Disconnected from socket: %s", name(), err.what());
         sleep(chrono::duration<double>(1));
         reconnect_dwm();
+      } catch (const dwmipc::ResultFailureError& err) {
+        m_log.warn("%s: Could not get updated client floating label: %s", name(), err.what());
       } catch (const dwmipc::IPCError& err) {
-        // Causes the module to crash
-        // throw module_error(err.what());
-        return;
+        throw module_error(err.what());
       }
     } else {
       m_is_floating = false;
