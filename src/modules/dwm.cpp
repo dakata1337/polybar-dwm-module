@@ -459,7 +459,9 @@ namespace modules {
         sleep(chrono::duration<double>(1));
         reconnect_dwm();
       } catch (const dwmipc::IPCError& err) {
-        throw module_error(err.what());
+        // Causes the module to crash
+        // throw module_error(err.what());
+        return;
       }
     }
     update_title_label(new_title);
@@ -474,7 +476,9 @@ namespace modules {
         sleep(chrono::duration<double>(1));
         reconnect_dwm();
       } catch (const dwmipc::IPCError& err) {
-        throw module_error(err.what());
+        // Causes the module to crash
+        // throw module_error(err.what());
+        return;
       }
     } else {
       m_is_floating = false;
